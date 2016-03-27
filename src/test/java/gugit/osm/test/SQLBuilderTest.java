@@ -12,23 +12,23 @@ public class SQLBuilderTest {
 	@Test
 	public void testInsertSQL() {
 
-		WritePacket writePacket = new WritePacket("");
+		WritePacket writePacket = new WritePacket("", "PERSON");
 		writePacket.addElement("NAME", "name", "labas");
-		String sql = SQLBuilder.toInsertSQL("PERSON", writePacket );
+		String sql = SQLBuilder.toInsertSQL(writePacket );
 		
 		assertEquals(sql, "INSERT INTO PERSON (NAME) VALUES (:name)");
 	}
 
 	@Test
 	public void testUpdateSQL() {
-		WritePacket writePacket = new WritePacket("");
+		WritePacket writePacket = new WritePacket("", "PERSON");
 		
 		writePacket.addElement("NAME", "name", "labas");
 		writePacket.setID("ID", "id", new IPropertyAccessor() {
 			public Object getValue(Object arg0) { return 10; }
 			public void setValue(Object arg0, Object arg1){}});
 		
-		String sql = SQLBuilder.toUpdateSQL("PERSON", writePacket );
+		String sql = SQLBuilder.toUpdateSQL(writePacket );
 		
 		assertEquals(sql, "UPDATE PERSON SET NAME=:name WHERE ID=:id");
 	}

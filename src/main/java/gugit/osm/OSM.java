@@ -1,48 +1,37 @@
 package gugit.osm;
 
-import gugit.om.OM;
-import gugit.om.mapping.ISerializer;
-import gugit.om.mapping.ISerializerRegistry;
-import gugit.osm.utils.ResultsetRowIterator;
+import gugit.om.mapping.WriteBatch;
+import gugit.om.utils.IDataIterator;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 
 
 /***
- * extends gugit:: object mapper with abilities to map to SQL resultset
+ * interface to a (stateless) Object-SQL Mapping service
+ * 
  * @author urbonman
+ *
  */
-public class OSM extends OM{
-	
-	public OSM(ISerializerRegistry serializers) {
-		super(serializers);
-	}
-	
-	public <E> List<E> readEntities(ResultSet rs, Class<E> entityClass) {
-		reset();
-		
-		LinkedList<E> result = new LinkedList<E>();
+public interface OSM {
 
-		ISerializer<E> serializer = (ISerializer<E>)serializers.getSerializerFor(entityClass);
-		
-		E previousEntity = null;
-		ResultsetRowIterator rowIterator = new ResultsetRowIterator(rs);
-		try {
-			do{			
-				E entity = serializer.read(rowIterator, 0, readContext);
-				if (entity == previousEntity)
-					continue;
-				
-				result.add(entity);
-				previousEntity = entity;
-			}while (rs.next());
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} 		
-		return result;
-	}
-		
+	<E> void registerType(Class<E> entityClass);
+	
+	<E> WriteBatch writeEntity(E entity);
+	
+	<E> void writeEntity(E entity, WriteBatch batch);
+	
+	<E> WriteBatch writeEntities(Collection<E> entities);
+	
+	<E> void writeEntities(Collection<E> entities, WriteBatch writeBatch);
+	
+	<E> E readEntity(IDataIterator<Object> row, Class<E> entityClass);
+	
+	<E> Collection<E> readEntities(ResultSet resultset, Class<E> entityClass); 
+	
+	<E> E leftJoin(E entity, final String property, IDataIterator<Object> row);
+	
+	<E> void leftJoin(List<E> entities, final String property, ResultSet resultset);
+	
 }

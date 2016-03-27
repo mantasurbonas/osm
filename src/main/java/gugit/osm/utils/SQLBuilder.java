@@ -20,14 +20,14 @@ public class SQLBuilder {
 					.toLowerCase();
 	}
 	
-	public static String toSQL(final String tableName, WritePacket writePad) {
+	public static String toSQL(WritePacket writePad) {
 		if (writePad.getIdElement().value == null)
-			return toInsertSQL(tableName, writePad);
+			return toInsertSQL(writePad);
 		
-		return toUpdateSQL(tableName, writePad);
+		return toUpdateSQL(writePad);
 	}
 	
-	public static String toInsertSQL(final String tableName, WritePacket writePacket) {
+	public static String toInsertSQL(WritePacket writePacket) {
 		StringBuilder cols = new StringBuilder();
 		StringBuilder vals   = new StringBuilder();
 		String joinStr = "";
@@ -47,7 +47,7 @@ public class SQLBuilder {
 		}
 		
 		return "INSERT INTO "
-				+tableName
+				+writePacket.getEntityName()
 				+" ("
 				+ cols
 				+") VALUES ("
@@ -55,19 +55,19 @@ public class SQLBuilder {
 				+")";
 	}
 
-	public static String toUpdateSQL(final String tableName, WritePacket writePad) {
+	public static String toUpdateSQL(WritePacket writePacket) {
 		
-		if (writePad.getIdElement().value == NullWriteValue.getInstance())
+		if (writePacket.getIdElement().value == NullWriteValue.getInstance())
 			throw new RuntimeException("ID value not specified!");
 		
 		StringBuilder sql = new StringBuilder();
 		sql.append("UPDATE ")
-			.append(tableName)
+			.append(writePacket.getEntityName())
 			.append(" SET ");
 		
 		String joinStr = "";
 		
-		for (WritePacketElement data: writePad.getElements()){
+		for (WritePacketElement data: writePacket.getElements()){
 			sql.append(joinStr);
 			sql.append(data.columnName);
 			sql.append("=");
@@ -79,9 +79,9 @@ public class SQLBuilder {
 		}
 		
 		sql.append(" WHERE ")
-			.append(writePad.getIdElement().columnName)
+			.append(writePacket.getIdElement().columnName)
 			.append("=:")
-			.append(writePad.getIdElement().fieldName);
+			.append(writePacket.getIdElement().fieldName);
 		
 		return sql.toString();
 	}

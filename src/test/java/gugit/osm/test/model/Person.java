@@ -3,8 +3,8 @@ package gugit.osm.test.model;
 import gugit.om.annotations.Column;
 import gugit.om.annotations.Entity;
 import gugit.om.annotations.ID;
-import gugit.om.annotations.DetailEntities;
-import gugit.om.annotations.DetailEntity;
+import gugit.om.annotations.Pojo;
+import gugit.om.annotations.Pojos;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,10 +18,10 @@ public class Person {
 	@Column(name="NAME")
 	public String name;
 	
-	@DetailEntity
+	@Pojo(myColumn="CURRENT_ADDRESS_ID")
 	public Address currentAddress;
 	
-	@DetailEntities(detailClass=Address.class)
+	@Pojos(detailClass=Address.class)
 	public List<Address> previousAddresses = new LinkedList<Address>();
 
 	public Integer getId() {

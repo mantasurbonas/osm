@@ -12,7 +12,6 @@ public class SqlParameterSourceAdapter implements SqlParameterSource{
 
 	public SqlParameterSource wrap(WritePacket writePacket){
 		this.writePacket = writePacket;
-		
 		return this;
 	}
 	
@@ -28,14 +27,12 @@ public class SqlParameterSourceAdapter implements SqlParameterSource{
 
 	@Override
 	public Object getValue(String arg0) throws IllegalArgumentException {
-		System.out.println("get value of "+arg0);
 		WritePacketElement element = writePacket.getByFieldName(arg0);
 		return element==null?null:(element.value==NullWriteValue.getInstance()?null:element.value);
 	}
 
 	@Override
 	public boolean hasValue(String arg0) {
-		System.out.println("?hasValue of "+arg0+"?");
 		return writePacket.getByFieldName(arg0) != null;
 	}
 
