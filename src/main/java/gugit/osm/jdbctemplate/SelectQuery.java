@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -70,6 +71,7 @@ public class SelectQuery<T> {
 	}
 	
 	public Collection<T> list() {
+		this.result = new LinkedList<T>();
 		jdbcTemplate.query(sql, queryParams, rowCallbackHandler);
 		return result;
 	}

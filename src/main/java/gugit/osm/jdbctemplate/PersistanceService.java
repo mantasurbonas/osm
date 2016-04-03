@@ -34,6 +34,9 @@ public class PersistanceService implements SqlStatementRegistry{
 	
 	private SqlStatementRegistryImpl sqls = new SqlStatementRegistryImpl();
 	
+	
+	private static boolean debugSQL = false;
+	
 	public <E> void persist(E rootEntity){
 		persistWriteBatch(osm.writeEntity(rootEntity));
 	}
@@ -62,7 +65,8 @@ public class PersistanceService implements SqlStatementRegistry{
 	private void performUpdate(WritePacket writePacket, SqlParameterSource paramSource) {
 		String updateSql = sqls.getUpdateSql(writePacket);
 		
-		System.out.println(updateSql );
+		if (debugSQL)
+			System.out.println(updateSql );
 		
 		namedParameterJdbcTemplate.update(updateSql, paramSource);
 	}
@@ -70,7 +74,8 @@ public class PersistanceService implements SqlStatementRegistry{
 	private void performInsert(WritePacket writePacket, SqlParameterSource paramSource) {				
 		String insertSql = sqls.getInsertSql(writePacket);
 		
-		System.out.println(insertSql);
+		if (debugSQL)
+			System.out.println(insertSql);
 		
 		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 		namedParameterJdbcTemplate.update(insertSql, paramSource, keyHolder);
