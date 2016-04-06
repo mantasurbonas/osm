@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Scope("prototype")
-public class PersistanceService implements SqlStatementRegistry{
+public class PersistanceService{
 
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -66,6 +66,11 @@ public class PersistanceService implements SqlStatementRegistry{
 	private void performUpdate(WritePacket writePacket, SqlParameterSource paramSource) {
 		String updateSql = sqls.getUpdateSql(writePacket);
 		
+		if (updateSql == null){
+			System.out.println("skipping update of "+writePacket.getEntityName());
+			return;
+		}
+		
 		if (debugSQL)
 			System.out.println(updateSql );
 		
@@ -74,6 +79,11 @@ public class PersistanceService implements SqlStatementRegistry{
 
 	private void performInsert(WritePacket writePacket, SqlParameterSource paramSource) {				
 		String insertSql = sqls.getInsertSql(writePacket);
+		
+		if (insertSql == null){
+			System.out.println("skipping insert of "+writePacket.getEntityName());
+			return;
+		}
 		
 		if (debugSQL)
 			System.out.println(insertSql);
@@ -122,24 +132,51 @@ public class PersistanceService implements SqlStatementRegistry{
 		return null;
 	}
 
-	@Override
-	public void register(Class<?> type) {
-		sqls.register(EntityMarkingHelper.getEntityClass(type));
+	public class RegisterHelper{
+		private Class<?> type;
+		
+		RegisterHelper(Class<?> type){
+			this.type = type;
+		} 
+		
+		public RegisterHelper update(final String updateSql){
+			sqls.registerUpdateSql(type, updateSql);
+			return this;
+		}
+		
+		public RegisterHelper insert(final String insertSql){
+			sqls.registerInsertSql(type, insertSql);
+			return this;
+		}
+		
+		public RegisterHelper noUpdates(){
+			sqls.registerNoUpdateSql(type);
+			return this;
+		}
+		
+		public RegisterHelper noInserts(){
+			sqls.registerNoInsertSql(type);
+			return this;
+		}
+		
+		public RegisterHelper readonly(){
+			sqls.registerNoInsertSql(type);
+			sqls.registerNoUpdateSql(type);
+			return this;
+		}
+	}
+	
+	public RegisterHelper register(Class<?> type) {
+		type = EntityMarkingHelper.getEntityClass(type);
+		sqls.register(type);
 		osm.registerType(type);
+		return new RegisterHelper(type);
 	}
 
-	@Override
-	public void register(Class<?> type, String insertSQL, String updateSQL) {
-		sqls.register(EntityMarkingHelper.getEntityClass(type), insertSQL, updateSQL);
-		osm.registerType(type);
-	}
-
-	@Override
 	public String getUpdateSql(WritePacket writePacket) {
 		return sqls.getUpdateSql(writePacket);
 	}
 
-	@Override
 	public String getInsertSql(WritePacket writePacket) {
 		return sqls.getInsertSql(writePacket);
 	}

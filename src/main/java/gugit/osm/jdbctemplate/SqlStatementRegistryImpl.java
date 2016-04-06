@@ -13,6 +13,8 @@ public class SqlStatementRegistryImpl implements SqlStatementRegistry{
 	private static class PersistInfo{
 		public String insertSQL;
 		public String updateSQL;
+		public boolean insertsForbidden = false;
+		public boolean updatesForbidden = false;
 		public PersistInfo(String ins, String upd){
 			this.insertSQL=ins;
 			this.updateSQL=upd;
@@ -20,16 +22,11 @@ public class SqlStatementRegistryImpl implements SqlStatementRegistry{
 	}
 	private Map<Class<?>, PersistInfo> registeredPersistInfo = new HashMap<Class<?>, PersistInfo>();
 
-	
-	public void register(Class<?> type){
-		register(type, null, null);
-	}
-	
-	public synchronized void register(Class<?> type, String insertSQL, String updateSQL){
+	public synchronized void register(Class<?> type){
 		if (registeredPersistInfo.containsKey(type))
 			return;
 		
-		registeredPersistInfo.put(type, new PersistInfo(insertSQL, updateSQL));
+		registeredPersistInfo.put(type, new PersistInfo(null, null));
 	}
 	
 	public Collection<Class<?>> getRegisteredTypes(){
@@ -44,6 +41,9 @@ public class SqlStatementRegistryImpl implements SqlStatementRegistry{
 			register(entityClass);
 		
 		PersistInfo persistInfo = registeredPersistInfo.get(entityClass);
+		if (persistInfo.updatesForbidden)
+			return null;
+		
 		if (persistInfo.updateSQL != null)
 			return persistInfo.updateSQL;
 		
@@ -58,10 +58,29 @@ public class SqlStatementRegistryImpl implements SqlStatementRegistry{
 			register(entityClass);
 		
 		PersistInfo persistInfo = registeredPersistInfo.get(entityClass);
+		if (persistInfo.insertsForbidden)
+			return null;
+		
 		if (persistInfo.insertSQL != null)
 			return persistInfo.insertSQL;
 		
 		return SQLBuilder.toInsertSQL(writePacket);
+	}
+
+	public void registerUpdateSql(Class<?> type, String updateSql) {
+		registeredPersistInfo.get(type).updateSQL = updateSql;
+	}
+
+	public void registerInsertSql(Class<?> type, String insertSql) {
+		registeredPersistInfo.get(type).insertSQL = insertSql;
+	}
+
+	public void registerNoUpdateSql(Class<?> type) {
+		registeredPersistInfo.get(type).updatesForbidden = true;
+	}
+
+	public void registerNoInsertSql(Class<?> type) {
+		registeredPersistInfo.get(type).insertsForbidden = true;
 	}
 
 }
