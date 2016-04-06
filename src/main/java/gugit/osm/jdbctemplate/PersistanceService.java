@@ -3,6 +3,7 @@ package gugit.osm.jdbctemplate;
 import gugit.om.mapping.WriteBatch;
 import gugit.om.mapping.WritePacket;
 import gugit.om.mapping.WritePacketElement;
+import gugit.om.wrapping.EntityMarkingHelper;
 import gugit.osm.OSM;
 
 import java.util.Collection;
@@ -123,13 +124,13 @@ public class PersistanceService implements SqlStatementRegistry{
 
 	@Override
 	public void register(Class<?> type) {
-		sqls.register(type);
+		sqls.register(EntityMarkingHelper.getEntityClass(type));
 		osm.registerType(type);
 	}
 
 	@Override
 	public void register(Class<?> type, String insertSQL, String updateSQL) {
-		sqls.register(type, insertSQL, updateSQL);
+		sqls.register(EntityMarkingHelper.getEntityClass(type), insertSQL, updateSQL);
 		osm.registerType(type);
 	}
 

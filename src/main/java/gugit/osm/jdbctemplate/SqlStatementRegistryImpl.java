@@ -1,6 +1,7 @@
 package gugit.osm.jdbctemplate;
 
 import gugit.om.mapping.WritePacket;
+import gugit.om.wrapping.EntityMarkingHelper;
 import gugit.osm.utils.SQLBuilder;
 
 import java.util.Collection;
@@ -37,6 +38,7 @@ public class SqlStatementRegistryImpl implements SqlStatementRegistry{
 
 	public String getUpdateSql(WritePacket writePacket) {
 		Class<?> entityClass = writePacket.getEntity().getClass();
+		entityClass = EntityMarkingHelper.getEntityClass(entityClass);
 		
 		if (!registeredPersistInfo.containsKey(entityClass))
 			register(entityClass);
@@ -50,6 +52,7 @@ public class SqlStatementRegistryImpl implements SqlStatementRegistry{
 
 	public String getInsertSql(WritePacket writePacket) {
 		Class<?> entityClass = writePacket.getEntity().getClass();
+		entityClass = EntityMarkingHelper.getEntityClass(entityClass);
 		
 		if (!registeredPersistInfo.containsKey(entityClass))
 			register(entityClass);
