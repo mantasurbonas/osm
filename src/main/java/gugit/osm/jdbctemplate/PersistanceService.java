@@ -59,7 +59,7 @@ public class PersistanceService{
 			if (writePacket.getIdElement().value == null)
 				performInsert(writePacket, paramSourceAdapter.wrap(writePacket));
 			else
-				performUpdate(writePacket, paramSourceAdapter.wrap(writePacket));
+				performUpdate(writePacket, paramSourceAdapter.wrap(writePacket));			
 		}
 	}
 	
@@ -104,10 +104,14 @@ public class PersistanceService{
 							+ "in the keylist "+keyHolder.getKeyList()+". "
 							+ "Did the insert succeed?");
 		}
-		else
-			writePacket.updateIDValue(idVal);		
+		else{
+			writePacket.updateIDValue(idVal);
+		}
+		// TODO: potentially update other properties as well
 		
-		// TODO: update other properties as well
+		// performing insert does change object's id thus automatically makes it 'dirty'.
+		// explicitely stating that the (just persisted) object is NOT dirty at this moment:
+		EntityMarkingHelper.setDirty(writePacket.getEntity(), false);
 	}
 	
 	private static Object findIDValue(String idColumnName, List<Map<String, Object>> keyList){
