@@ -1,13 +1,16 @@
 package gugit.osm.jdbctemplate;
 
-import gugit.om.mapping.WritePacket;
+import gugit.om.mapping.EntityWritePacket;
+import gugit.om.mapping.M2MWritePacket;
 
 public interface SqlStatementRegistry {
 
-	void register(Class<?> type);
+	void registerEntity(Class<?> type);
 
-	String getUpdateSql(WritePacket writePacket);
+	String getUpdateSql(EntityWritePacket writePacket);
 	
-	String getInsertSql(WritePacket writePacket);
+	String getInsertSql(EntityWritePacket writePacket);
+	
+	String[] getWriteSqls(M2MWritePacket writePacket);
 	
 }

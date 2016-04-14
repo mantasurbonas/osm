@@ -1,16 +1,17 @@
 package gugit.osm.jdbctemplate;
 
-import gugit.om.mapping.NullWriteValue;
-import gugit.om.mapping.WritePacket;
-import gugit.om.mapping.WritePacketElement;
-
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
+import gugit.om.mapping.EntityWritePacket;
+import gugit.om.mapping.IWritePacket;
+import gugit.om.mapping.NullWriteValue;
+import gugit.om.mapping.WritePacketElement;
 
 public class SqlParameterSourceAdapter implements SqlParameterSource{
 
-	private WritePacket writePacket;
+	private IWritePacket writePacket;
 
-	public SqlParameterSource wrap(WritePacket writePacket){
+	public SqlParameterSource wrap(IWritePacket writePacket){
 		this.writePacket = writePacket;
 		return this;
 	}

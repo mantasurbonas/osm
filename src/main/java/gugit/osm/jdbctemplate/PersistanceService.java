@@ -1,11 +1,5 @@
 package gugit.osm.jdbctemplate;
 
-import gugit.om.mapping.WriteBatch;
-import gugit.om.mapping.WritePacket;
-import gugit.om.mapping.WritePacketElement;
-import gugit.om.wrapping.EntityMarkingHelper;
-import gugit.osm.OSM;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +11,14 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
+
+import gugit.om.mapping.EntityWritePacket;
+import gugit.om.mapping.IWritePacket;
+import gugit.om.mapping.M2MWritePacket;
+import gugit.om.mapping.WriteBatch;
+import gugit.om.mapping.WritePacketElement;
+import gugit.om.wrapping.EntityMarkingHelper;
+import gugit.osm.OSM;
 
 /***
  * a convenient wrapper around JDBC NamedTemplate and gugit OSM (for writing entities to SQL)
@@ -54,17 +56,40 @@ public class PersistanceService{
 	private void persistWriteBatch(WriteBatch batch) {
 		SqlParameterSourceAdapter paramSourceAdapter = new SqlParameterSourceAdapter();
 		
-		WritePacket writePacket;
+		IWritePacket writePacket;
 		while ((writePacket= batch.getNext()) != null){
-			if (writePacket.getIdElement().value == null)
-				performInsert(writePacket, paramSourceAdapter.wrap(writePacket));
+			if (writePacket instanceof EntityWritePacket)
+				write((EntityWritePacket)writePacket,paramSourceAdapter);
 			else
-				performUpdate(writePacket, paramSourceAdapter.wrap(writePacket));			
+				write((M2MWritePacket)writePacket,paramSourceAdapter);
 		}
 	}
+
+	private void write(M2MWritePacket writePacket, SqlParameterSourceAdapter paramSourceAdapter) {
+		String[] sqls = getM2MBindingSql(writePacket);
+		if (sqls == null){
+			System.out.println("skipping update of "+writePacket.getEntityName());
+			return;
+		}
+		
+		if (debugSQL)
+			System.out.println(sqls[0]+"\n"+sqls[1]);
+		
+		SqlParameterSource paramSource = paramSourceAdapter.wrap(writePacket);
+		
+		namedParameterJdbcTemplate.update(sqls[0], paramSource);
+		namedParameterJdbcTemplate.update(sqls[1], paramSource);
+	}
+
+	private void write(EntityWritePacket writePacket, SqlParameterSourceAdapter paramSourceAdapter){
+		if (writePacket.getIdElement().value == null)
+			performInsert(writePacket, paramSourceAdapter.wrap(writePacket));
+		else
+			performUpdate(writePacket, paramSourceAdapter.wrap(writePacket));			
+	}
 	
-	private void performUpdate(WritePacket writePacket, SqlParameterSource paramSource) {
-		String updateSql = sqls.getUpdateSql(writePacket);
+	private void performUpdate(EntityWritePacket writePacket, SqlParameterSource paramSource) {
+		String updateSql = getUpdateSql(writePacket);
 		
 		if (updateSql == null){
 			System.out.println("skipping update of "+writePacket.getEntityName());
@@ -77,8 +102,8 @@ public class PersistanceService{
 		namedParameterJdbcTemplate.update(updateSql, paramSource);
 	}
 
-	private void performInsert(WritePacket writePacket, SqlParameterSource paramSource) {				
-		String insertSql = sqls.getInsertSql(writePacket);
+	private void performInsert(EntityWritePacket writePacket, SqlParameterSource paramSource) {				
+		String insertSql = getInsertSql(writePacket);
 		
 		if (insertSql == null){
 			System.out.println("skipping insert of "+writePacket.getEntityName());
@@ -93,7 +118,7 @@ public class PersistanceService{
 		updatePacketAfterDBInsert(writePacket, keyHolder);
 	}
 	
-	private static void updatePacketAfterDBInsert(WritePacket writePacket, KeyHolder keyHolder){
+	private static void updatePacketAfterDBInsert(EntityWritePacket writePacket, KeyHolder keyHolder){
 		WritePacketElement idElement = writePacket.getIdElement();
 		
 		Object idVal = findIDValue(idElement.columnName, keyHolder.getKeyList());
@@ -136,53 +161,79 @@ public class PersistanceService{
 		return null;
 	}
 
-	public class RegisterHelper{
+	public class RegisterEntityHelper{
 		private Class<?> type;
 		
-		RegisterHelper(Class<?> type){
+		RegisterEntityHelper(Class<?> type){
 			this.type = type;
 		} 
 		
-		public RegisterHelper update(final String updateSql){
+		public RegisterEntityHelper update(final String updateSql){
 			sqls.registerUpdateSql(type, updateSql);
 			return this;
 		}
 		
-		public RegisterHelper insert(final String insertSql){
+		public RegisterEntityHelper insert(final String insertSql){
 			sqls.registerInsertSql(type, insertSql);
 			return this;
 		}
 		
-		public RegisterHelper noUpdates(){
+		public RegisterEntityHelper noUpdates(){
 			sqls.registerNoUpdateSql(type);
 			return this;
 		}
 		
-		public RegisterHelper noInserts(){
+		public RegisterEntityHelper noInserts(){
 			sqls.registerNoInsertSql(type);
 			return this;
 		}
 		
-		public RegisterHelper readonly(){
+		public RegisterEntityHelper readonly(){
 			sqls.registerNoInsertSql(type);
 			sqls.registerNoUpdateSql(type);
 			return this;
 		}
 	}
 	
-	public RegisterHelper register(Class<?> type) {
+	public class RegisterM2MHelper{
+		String tablename;
+		public RegisterM2MHelper(String tablename){
+			this.tablename = tablename;
+		}
+		
+		public RegisterM2MHelper noWrites(){
+			sqls.registerNoM2MWrites(tablename);
+			return this;
+		}
+		
+		public RegisterM2MHelper write(String[] writeSqls){
+			sqls.registerWriteSqls(tablename, writeSqls);
+			return this;
+		}
+	}
+	
+	public RegisterEntityHelper register(Class<?> type) {
 		type = EntityMarkingHelper.getEntityClass(type);
-		sqls.register(type);
+		sqls.registerEntity(type);
 		osm.registerType(type);
-		return new RegisterHelper(type);
+		return new RegisterEntityHelper(type);
 	}
 
-	public String getUpdateSql(WritePacket writePacket) {
+	public RegisterM2MHelper register(String tablename){
+		sqls.registerM2M(tablename);
+		return new RegisterM2MHelper(tablename);
+	}
+	
+	public String getUpdateSql(EntityWritePacket writePacket) {
 		return sqls.getUpdateSql(writePacket);
 	}
 
-	public String getInsertSql(WritePacket writePacket) {
+	public String getInsertSql(EntityWritePacket writePacket) {
 		return sqls.getInsertSql(writePacket);
+	}
+	
+	public String[] getM2MBindingSql(M2MWritePacket writePacket){
+		return sqls.getWriteSqls(writePacket);
 	}
 
 }
