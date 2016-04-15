@@ -2,7 +2,6 @@ package gugit.osm.jdbctemplate;
 
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
-import gugit.om.mapping.EntityWritePacket;
 import gugit.om.mapping.IWritePacket;
 import gugit.om.mapping.NullWriteValue;
 import gugit.om.mapping.WritePacketElement;

@@ -1,11 +1,10 @@
 package gugit.osm;
 
-import gugit.om.mapping.WriteBatch;
-import gugit.om.utils.IDataIterator;
-
 import java.sql.ResultSet;
 import java.util.Collection;
-import java.util.List;
+
+import gugit.om.mapping.WriteBatch;
+import gugit.om.utils.IDataIterator;
 
 
 /***
@@ -32,6 +31,6 @@ public interface OSM {
 	
 	<E> E leftJoin(E entity, final String property, IDataIterator<Object> row);
 	
-	<E> void leftJoin(List<E> entities, final String property, ResultSet resultset);
+	<E> void leftJoin(Collection<E> entities, final String property, ResultSet resultset);
 	
 }

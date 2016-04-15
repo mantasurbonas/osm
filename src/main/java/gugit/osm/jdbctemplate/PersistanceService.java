@@ -52,6 +52,11 @@ public class PersistanceService{
 		return new SelectQuery<T>(namedParameterJdbcTemplate, osm, entityClass).setSql(sql);
 	}
 	
+	public <T> JoinQuery<T> leftJoin(Collection<T> entities, String propertyName, String sql){
+		return new JoinQuery<T>(namedParameterJdbcTemplate, osm, propertyName)
+							.setEntities(entities)
+							.setSql(sql);
+	}
 	
 	private void persistWriteBatch(WriteBatch batch) {
 		SqlParameterSourceAdapter paramSourceAdapter = new SqlParameterSourceAdapter();

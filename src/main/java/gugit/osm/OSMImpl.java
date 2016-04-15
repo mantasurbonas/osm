@@ -1,17 +1,18 @@
 package gugit.osm;
 
-import gugit.om.OM;
-import gugit.om.mapping.ISerializer;
-import gugit.om.mapping.ReadContext;
-import gugit.osm.utils.ResultsetRowIterator;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+
+import gugit.om.OM;
+import gugit.om.mapping.ISerializer;
+import gugit.om.mapping.ReadContext;
+import gugit.osm.utils.ResultsetRowIterator;
 
 
 /***
@@ -45,16 +46,16 @@ public class OSMImpl extends OM implements OSM{
 		return result;
 	}
 	
-	public <E> void leftJoin(List<E> entities, final String property, ResultSet rs){
+	public <E> void leftJoin(Collection<E> entities, final String property, ResultSet rs){
 		if (entities.isEmpty())
 			return;
 		
-		@SuppressWarnings("unchecked")
-		ISerializer<E> serializer = (ISerializer<E>)entityService.getSerializerFor(entities.get(0).getClass());
-		int propIndex = serializer.getPropertyIndex(property);
-
 		Iterator<E> it = entities.iterator();
 		E entity = it.next();
+		
+		@SuppressWarnings("unchecked")
+		ISerializer<E> serializer = (ISerializer<E>)entityService.getSerializerFor(entity.getClass());
+		int propIndex = serializer.getPropertyIndex(property);
 		
 		ReadContext readContext = new ReadContext(entityService, entityService);
 		ResultsetRowIterator row = new ResultsetRowIterator(rs);
