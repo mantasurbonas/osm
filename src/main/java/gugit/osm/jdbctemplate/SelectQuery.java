@@ -49,7 +49,17 @@ public class SelectQuery<T> {
 		return this;
 	}
 
+	public SelectQuery<T> setInts(String paramName, Collection<Integer> paramValues){
+		this.queryParams.put(paramName, paramValues);
+		return this;
+	}
+	
 	public SelectQuery<T> setString(String paramName, String paramValue) {
+		this.queryParams.put(paramName, paramValue);
+		return this;
+	}
+	
+	public SelectQuery<T> setStrings(String paramName, Collection<String> paramValue){
 		this.queryParams.put(paramName, paramValue);
 		return this;
 	}
