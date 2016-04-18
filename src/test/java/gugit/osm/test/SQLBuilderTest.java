@@ -24,6 +24,7 @@ public class SQLBuilderTest {
 		assertEquals(sql, "INSERT INTO PERSON (NAME) VALUES (:name)");
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void testUpdateSQL() {
 		EntityWritePacket writePacket = new EntityWritePacket("", "PERSON");
@@ -38,6 +39,7 @@ public class SQLBuilderTest {
 		assertEquals(sql, "UPDATE PERSON SET NAME=:name WHERE ID=:id");
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void testWriteSQLs(){
 		M2MWritePacket writePacket = new M2MWritePacket("SPACESHIP_TO_EARTH");
