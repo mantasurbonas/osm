@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -24,6 +26,8 @@ public class JoinQuery<T> {
 	private RowCallbackHandlerImpl rowCallbackHandler = new RowCallbackHandlerImpl();
 	private Map<String, Object> queryParams = new HashMap<String, Object>();
 
+	private static final Logger logger = LogManager.getLogger();
+	
 	public JoinQuery(NamedParameterJdbcTemplate namedParameterJdbcTemplate, OSM osm, String propertyName) {
 		this.jdbc = namedParameterJdbcTemplate;
 		this.osm = osm;
@@ -67,6 +71,7 @@ public class JoinQuery<T> {
 	}
 	
 	public void execute(){
+		logger.debug(sql);
 		jdbc.query(sql, queryParams, rowCallbackHandler);
 	}
 }

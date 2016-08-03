@@ -1,18 +1,20 @@
 package gugit.osm.jdbctemplate;
 
-import gugit.osm.OSM;
-
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import gugit.osm.OSM;
 
 /***
  * a convenient wrapper around JDBC NamedTemplate and gugit OSM (for reading entities from SQL)
@@ -32,6 +34,8 @@ public class SelectQuery<T> {
 	private Map<String, Object> queryParams = new HashMap<String, Object>();
 
 	private Collection<T> result = null;
+	
+	private static final Logger logger = LogManager.getLogger();
 	
 	public SelectQuery(NamedParameterJdbcTemplate jdbcTemplate, OSM osm, Class<T> entityClass) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -81,7 +85,8 @@ public class SelectQuery<T> {
 	}
 	
 	public Collection<T> list() {
-		this.result = new LinkedList<T>();
+		this.result = new ArrayList<T>();
+		logger.debug(sql);
 		jdbcTemplate.query(sql, queryParams, rowCallbackHandler);
 		return result;
 	}

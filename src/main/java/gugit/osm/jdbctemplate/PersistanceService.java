@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -37,8 +39,7 @@ public class PersistanceService{
 	
 	private SqlStatementRegistryImpl sqls = new SqlStatementRegistryImpl();
 	
-	
-	private static boolean debugSQL = false;
+	private static final Logger logger = LogManager.getLogger();
 	
 	public <E> void persist(E rootEntity){
 		persistWriteBatch(osm.writeEntity(rootEntity));
@@ -73,12 +74,13 @@ public class PersistanceService{
 	private void write(M2MWritePacket writePacket, SqlParameterSourceAdapter paramSourceAdapter) {
 		String[] sqls = getM2MBindingSql(writePacket);
 		if (sqls == null){
-			System.out.println("skipping update of "+writePacket.getEntityName());
+			logger.warn("skipping update of "+writePacket.getEntityName());
 			return;
 		}
 		
-		if (debugSQL)
-			System.out.println(sqls[0]+"\n"+sqls[1]);
+		logger.debug("persisting many-to-many relationship");
+		logger.debug(sqls[0]);
+		logger.debug(sqls[1]);
 		
 		SqlParameterSource paramSource = paramSourceAdapter.wrap(writePacket);
 		
@@ -101,8 +103,7 @@ public class PersistanceService{
 			return;
 		}
 		
-		if (debugSQL)
-			System.out.println(updateSql );
+		logger.debug(updateSql);
 		
 		namedParameterJdbcTemplate.update(updateSql, paramSource);
 	}
@@ -111,12 +112,11 @@ public class PersistanceService{
 		String insertSql = getInsertSql(writePacket);
 		
 		if (insertSql == null){
-			System.out.println("skipping insert of "+writePacket.getEntityName());
+			logger.warn("skipping insert of "+writePacket.getEntityName());
 			return;
 		}
 		
-		if (debugSQL)
-			System.out.println(insertSql);
+		logger.debug(insertSql);
 		
 		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 		namedParameterJdbcTemplate.update(insertSql, paramSource, keyHolder);
@@ -129,7 +129,7 @@ public class PersistanceService{
 		Object idVal = findIDValue(idElement.columnName, keyHolder.getKeyList());
 		
 		if (idVal == null){
-			System.out.println("WARNING: "
+			logger.warn("WARNING: "
 							+ "could not find ID ('"+idElement.columnName+"') "
 							+ "in the keylist "+keyHolder.getKeyList()+". "
 							+ "Did the insert succeed?");
