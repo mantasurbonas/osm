@@ -27,7 +27,7 @@ public class OSMImpl extends OM implements OSM{
 	
 	public <E> List<E> readEntities(ResultSet rs, Class<E> entityClass) {		
 		ISerializer<E> serializer = (ISerializer<E>)entityService.getSerializerFor(entityClass);
-		ReadContext readContext = new ReadContext(entityService, entityService);
+		ReadContext readContext = new ReadContext(entityService);
 		
 		ResultsetRowIterator row = new ResultsetRowIterator(rs);
 		LinkedList<E> result = new LinkedList<E>();
@@ -57,7 +57,7 @@ public class OSMImpl extends OM implements OSM{
 		ISerializer<E> serializer = (ISerializer<E>)entityService.getSerializerFor(entity.getClass());
 		int propIndex = serializer.getPropertyIndex(property);
 		
-		ReadContext readContext = new ReadContext(entityService, entityService);
+		ReadContext readContext = new ReadContext(entityService);
 		ResultsetRowIterator row = new ResultsetRowIterator(rs);
 		
 		try {
