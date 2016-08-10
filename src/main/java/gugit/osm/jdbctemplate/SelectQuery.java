@@ -77,7 +77,17 @@ public class SelectQuery<T> {
 		this.queryParams.put(paramName, paramValue);
 		return this;
 	}
-		
+
+	public SelectQuery<T> setBoolean(String paramName, Boolean paramValue) {
+		this.queryParams.put(paramName, paramValue);
+		return this;
+	}
+
+	public SelectQuery<T> setDouble(String paramName, Double paramValue) {
+		this.queryParams.put(paramName, paramValue);
+		return this;
+	}
+	
 	private class RowCallbackHandlerImpl implements RowCallbackHandler{
 		public void processRow(ResultSet rs) throws SQLException {
 			result = osm.readEntities(rs, entityClass);

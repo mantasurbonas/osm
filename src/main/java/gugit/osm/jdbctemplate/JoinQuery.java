@@ -64,6 +64,16 @@ public class JoinQuery<T> {
 		return this;
 	}
 	
+	public JoinQuery<T> setBoolean(String paramName, Boolean paramValue) {
+		this.queryParams.put(paramName, paramValue);
+		return this;
+	}
+
+	public JoinQuery<T> setDouble(String paramName, Double paramValue) {
+		this.queryParams.put(paramName, paramValue);
+		return this;
+	}
+	
 	private class RowCallbackHandlerImpl implements RowCallbackHandler{
 		public void processRow(ResultSet rs) throws SQLException {
 			osm.leftJoin(entities, property, rs);
