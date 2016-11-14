@@ -28,7 +28,7 @@ public class SelectQuery<T> {
 	private NamedParameterJdbcTemplate jdbcTemplate;
 	private Class<T> entityClass;
 	private OSM osm;
-	private RowCallbackHandlerImpl rowCallbackHandler = new RowCallbackHandlerImpl();
+	private RowCallbackHandler rowCallbackHandler;
 	
 	private String sql;
 	private Map<String, Object> queryParams = new HashMap<String, Object>();
@@ -41,6 +41,11 @@ public class SelectQuery<T> {
 		this.jdbcTemplate = jdbcTemplate;
 		this.osm = osm;
 		this.entityClass = entityClass;
+		
+		if (isPrimitive(entityClass))
+			this.rowCallbackHandler = new PrimitiveMapperRowCallbackHandlerImpl();
+		else
+			this.rowCallbackHandler = new POJOMapperRowCallbackHandlerImpl();
 	}
 	
 	public SelectQuery<T> setSql(final String sql){
@@ -88,12 +93,38 @@ public class SelectQuery<T> {
 		return this;
 	}
 	
-	private class RowCallbackHandlerImpl implements RowCallbackHandler{
+	private boolean isPrimitive(Class<T> clazz) {
+		switch(clazz.getName()){
+			case "java.lang.String": 
+			case "java.lang.Integer": 
+			case "java.lang.Boolean": 
+			case "java.lang.Double": 
+			case "java.lang.Float": 
+			case "java.lang.Byte":
+			case "java.lang.Short":
+			case "java.lang.Long":
+			case "java.lang.Character":
+			case "java.math.BigDecimal":
+				return true;
+		}
+		return false;
+	}
+	
+	private class POJOMapperRowCallbackHandlerImpl implements RowCallbackHandler{
 		public void processRow(ResultSet rs) throws SQLException {
 			result = osm.readEntities(rs, entityClass);
 		}
 	}
-	
+
+	private class PrimitiveMapperRowCallbackHandlerImpl implements RowCallbackHandler{
+		@SuppressWarnings("unchecked")
+		public void processRow(ResultSet rs) throws SQLException {
+			if (result == null)
+				result = new ArrayList<>();
+			result.add((T)rs.getObject(1));
+		}
+	}
+
 	public Collection<T> list() {
 		this.result = new ArrayList<T>();
 		logger.debug(sql);
