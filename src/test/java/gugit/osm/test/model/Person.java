@@ -1,28 +1,32 @@
 package gugit.osm.test.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import gugit.om.annotations.Column;
 import gugit.om.annotations.Entity;
 import gugit.om.annotations.ID;
 import gugit.om.annotations.Pojo;
 import gugit.om.annotations.Pojos;
-
-import java.util.LinkedList;
-import java.util.List;
+import gugit.om.annotations.Transient;
 
 @Entity(name="PERSON")
 public class Person {
 
 	@ID
-	public Integer id;
+	private Integer id;
 	
 	@Column(name="NAME")
-	public String name;
+	private String name;
 	
 	@Pojo(myColumn="CURRENT_ADDRESS_ID")
-	public Address currentAddress;
+	private Address currentAddress;
+	
+	@Transient
+	private String nevermindMe;
 	
 	@Pojos(detailClass=Address.class)
-	public List<Address> previousAddresses = new LinkedList<Address>();
+	private List<Address> previousAddresses = new LinkedList<Address>();
 
 	public Integer getId() {
 		return id;
@@ -61,6 +65,14 @@ public class Person {
 				+": "+name
 				+" who lives at "+currentAddress+" "
 				+(previousAddresses.isEmpty()?"": (" (previously, "+previousAddresses+")") );
+	}
+
+	public String getNevermindMe() {
+		return nevermindMe;
+	}
+
+	public void setNevermindMe(String nevermindMe) {
+		this.nevermindMe = nevermindMe;
 	}
 }
 

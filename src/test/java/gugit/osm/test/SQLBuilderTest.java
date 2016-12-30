@@ -62,8 +62,5 @@ public class SQLBuilderTest {
 		assertEquals(sqls.length, 2);
 
 		assertEquals(sqls[0], "DELETE FROM SPACESHIP_TO_EARTH WHERE SPACESHIP_ID=:spaceship AND EARTH_ID NOT IN (:earth)");
-		
-		System.out.println(sqls[0]);
-		System.out.println(sqls[1]);
 	}
 }
