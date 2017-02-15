@@ -126,7 +126,7 @@ public class SelectQuery<T> {
 		}
 	}
 
-	public Collection<T> list() {
+	public List<T> list() {
 		this.result = new ArrayList<T>();
 		logger.debug(sql);
 		jdbcTemplate.query(sql, queryParams, rowCallbackHandler);
