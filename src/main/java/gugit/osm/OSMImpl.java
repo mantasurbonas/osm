@@ -2,9 +2,9 @@ package gugit.osm;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class OSMImpl extends OM implements OSM{
 		ReadContext readContext = new ReadContext(entityService);
 		
 		ResultsetRowIterator row = new ResultsetRowIterator(rs);
-		LinkedList<E> result = new LinkedList<E>();
+		ArrayList<E> result = new ArrayList<E>();
 		E previousEntity = null;
 		try {
 			do{			

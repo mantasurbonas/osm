@@ -2,6 +2,7 @@ package gugit.osm;
 
 import java.sql.ResultSet;
 import java.util.Collection;
+import java.util.List;
 
 import gugit.om.mapping.WriteBatch;
 import gugit.om.utils.IDataIterator;
@@ -27,7 +28,7 @@ public interface OSM {
 	
 	<E> E readEntity(IDataIterator<Object> row, Class<E> entityClass);
 	
-	<E> Collection<E> readEntities(ResultSet resultset, Class<E> entityClass); 
+	<E> List<E> readEntities(ResultSet resultset, Class<E> entityClass); 
 	
 	<E> E leftJoin(E entity, final String property, IDataIterator<Object> row);
 	

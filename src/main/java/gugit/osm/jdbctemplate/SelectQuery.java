@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +34,7 @@ public class SelectQuery<T> {
 	private String sql;
 	private Map<String, Object> queryParams = new HashMap<String, Object>();
 
-	private Collection<T> result = null;
+	private List<T> result = null;
 	
 	private static final Logger logger = LogManager.getLogger();
 	
@@ -130,6 +131,19 @@ public class SelectQuery<T> {
 		logger.debug(sql);
 		jdbcTemplate.query(sql, queryParams, rowCallbackHandler);
 		return result;
+	}
+	
+	public T get(){
+		ArrayList<T> res = new ArrayList<T>();
+		this.result = res;
+		jdbcTemplate.query(sql, queryParams, rowCallbackHandler);
+		if (result.size() == 0)
+			return null;
+		
+		if (result.size () == 1)
+			return result.get(0);
+		
+		throw new OsmJdbcException("expected single result, actual size is "+result.size()+" for SQL query "+sql);
 	}
 
 }
