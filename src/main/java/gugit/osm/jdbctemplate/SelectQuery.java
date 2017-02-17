@@ -133,7 +133,7 @@ public class SelectQuery<T> {
 		return result;
 	}
 	
-	public T get(){
+	public T singleResult(){
 		ArrayList<T> res = new ArrayList<T>();
 		this.result = res;
 		jdbcTemplate.query(sql, queryParams, rowCallbackHandler);
