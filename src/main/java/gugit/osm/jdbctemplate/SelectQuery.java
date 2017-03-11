@@ -4,15 +4,15 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import gugit.osm.OSM;
@@ -32,7 +32,7 @@ public class SelectQuery<T> {
 	private RowCallbackHandler rowCallbackHandler;
 	
 	private String sql;
-	private Map<String, Object> queryParams = new HashMap<String, Object>();
+	private MapSqlParameterSource queryParams = new MapSqlParameterSource();
 
 	private List<T> result = null;
 	
@@ -55,42 +55,60 @@ public class SelectQuery<T> {
 	}
 	
 	public SelectQuery<T> setInt(String paramName, Integer paramValue) {
-		this.queryParams.put(paramName, paramValue);
+		if (paramValue != null)
+			this.queryParams.addValue(paramName, paramValue);
+		else
+			this.queryParams.addValue(paramName, null, Types.INTEGER);
 		return this;
 	}
 
 	public SelectQuery<T> setInts(String paramName, Collection<Integer> paramValues){
-		this.queryParams.put(paramName, paramValues);
+		this.queryParams.addValue(paramName, paramValues);
 		return this;
 	}
 	
 	public SelectQuery<T> setString(String paramName, String paramValue) {
-		this.queryParams.put(paramName, paramValue);
+		if (paramValue != null)
+			this.queryParams.addValue(paramName, paramValue);
+		else
+			this.queryParams.addValue(paramName, null, Types.VARCHAR);
 		return this;
 	}
 	
 	public SelectQuery<T> setStrings(String paramName, Collection<String> paramValue){
-		this.queryParams.put(paramName, paramValue);
+		this.queryParams.addValue(paramName, paramValue);
 		return this;
 	}
 	
 	public SelectQuery<T> setTimestamp(String paramName, Timestamp paramValue) {
-		this.queryParams.put(paramName, paramValue);
+		if (paramValue != null)
+			this.queryParams.addValue(paramName, paramValue);
+		else
+			this.queryParams.addValue(paramName, null, Types.TIMESTAMP);
 		return this;
 	}
 
 	public SelectQuery<T> setDate(String paramName, Date paramValue) {
-		this.queryParams.put(paramName, paramValue);
+		if (paramValue != null)
+			this.queryParams.addValue(paramName, paramValue);
+		else
+			this.queryParams.addValue(paramName, null, Types.DATE);
 		return this;
 	}
 
 	public SelectQuery<T> setBoolean(String paramName, Boolean paramValue) {
-		this.queryParams.put(paramName, paramValue);
+		if (paramValue != null)
+			this.queryParams.addValue(paramName, paramValue);
+		else
+			this.queryParams.addValue(paramName, null, Types.BOOLEAN);
 		return this;
 	}
 
 	public SelectQuery<T> setDouble(String paramName, Double paramValue) {
-		this.queryParams.put(paramName, paramValue);
+		if (paramValue != null)
+			this.queryParams.addValue(paramName, paramValue);
+		else
+			this.queryParams.addValue(paramName, null, Types.DOUBLE);
 		return this;
 	}
 	
@@ -106,6 +124,8 @@ public class SelectQuery<T> {
 			case "java.lang.Long":
 			case "java.lang.Character":
 			case "java.math.BigDecimal":
+			case "java.sql.Date":
+			case "java.sql.Timestamp":
 				return true;
 		}
 		return false;
