@@ -22,6 +22,9 @@ import gugit.om.mapping.WritePacketElement;
 import gugit.om.wrapping.EntityMarkingHelper;
 import gugit.osm.OSM;
 
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
 /***
  * a convenient wrapper around JDBC NamedTemplate and gugit OSM (for writing entities to SQL)
  * 
@@ -40,7 +43,7 @@ public class PersistanceService{
 	private SqlStatementRegistryImpl sqls = new SqlStatementRegistryImpl();
 	
 	private static final Logger logger = LogManager.getLogger();
-	
+
 	public <E> void persist(E rootEntity){
 		persistWriteBatch(osm.writeEntity(rootEntity));
 	}
@@ -239,6 +242,11 @@ public class PersistanceService{
 	
 	public String[] getM2MBindingSql(M2MWritePacket writePacket){
 		return sqls.getWriteSqls(writePacket);
+	}
+
+	public PersistanceService setDataSource(DataSource dataSource) {
+		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+		return this;
 	}
 
 }
