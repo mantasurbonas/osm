@@ -22,7 +22,6 @@ import gugit.om.mapping.WritePacketElement;
 import gugit.om.wrapping.EntityMarkingHelper;
 import gugit.osm.OSM;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 /***
