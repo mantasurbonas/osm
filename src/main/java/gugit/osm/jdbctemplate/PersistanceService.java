@@ -101,7 +101,7 @@ public class PersistanceService{
 		String updateSql = getUpdateSql(writePacket);
 		
 		if (updateSql == null){
-			System.out.println("skipping update of "+writePacket.getEntityName());
+			logger.warn("skipping update of "+writePacket.getEntityName());
 			return;
 		}
 		
