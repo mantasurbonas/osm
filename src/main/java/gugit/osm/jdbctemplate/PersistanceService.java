@@ -4,8 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -40,8 +41,8 @@ public class PersistanceService{
 	private OSM osm;
 	
 	private SqlStatementRegistryImpl sqls = new SqlStatementRegistryImpl();
-	
-	private static final Logger logger = LogManager.getLogger();
+
+	private final static Logger logger = LoggerFactory.getLogger(PersistanceService.class);
 
 	public <E> void persist(E rootEntity){
 		persistWriteBatch(osm.writeEntity(rootEntity));
@@ -79,7 +80,7 @@ public class PersistanceService{
 			logger.warn("skipping update of "+writePacket.getEntityName());
 			return;
 		}
-		
+
 		logger.debug("persisting many-to-many relationship");
 		logger.debug(sqls[0]);
 		logger.debug(sqls[1]);
@@ -104,7 +105,7 @@ public class PersistanceService{
 			logger.warn("skipping update of "+writePacket.getEntityName());
 			return;
 		}
-		
+
 		logger.debug(updateSql);
 		
 		namedParameterJdbcTemplate.update(updateSql, paramSource);
@@ -117,7 +118,7 @@ public class PersistanceService{
 			logger.warn("skipping insert of "+writePacket.getEntityName());
 			return;
 		}
-		
+
 		logger.debug(insertSql);
 		
 		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
