@@ -8,7 +8,7 @@
 
 	<groupId>gugit</groupId>
 	<artifactId>gugit-osm</artifactId>
-	<version>v1.0.u</version>
+	<version>v1.0.v</version>
 	<packaging>jar</packaging>
 
 	<name>Gugit Object to SQL Mapping</name>
@@ -46,7 +46,7 @@
 		<dependency>
 		    <groupId>gugit</groupId>
 		    <artifactId>gugit-om</artifactId>
-		    <version>v1.0.l</version>
+		    <version>v1.0.m</version>
 		</dependency>
 
 		<dependency>
