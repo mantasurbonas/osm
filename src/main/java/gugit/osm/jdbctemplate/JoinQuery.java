@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -26,7 +26,7 @@ public class JoinQuery<T> {
 	private RowCallbackHandlerImpl rowCallbackHandler = new RowCallbackHandlerImpl();
 	private Map<String, Object> queryParams = new HashMap<String, Object>();
 
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LoggerFactory.getLogger(JoinQuery.class);
 	
 	public JoinQuery(NamedParameterJdbcTemplate namedParameterJdbcTemplate, OSM osm, String propertyName) {
 		this.jdbc = namedParameterJdbcTemplate;
