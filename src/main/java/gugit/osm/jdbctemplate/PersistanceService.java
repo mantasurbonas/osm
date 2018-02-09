@@ -62,6 +62,10 @@ public class PersistanceService{
 							.setSql(sql);
 	}
 	
+	public ArbitraryQuery arbitrary(final String sql){
+		return new ArbitraryQuery(namedParameterJdbcTemplate).setSql(sql);
+	}
+	
 	private void persistWriteBatch(WriteBatch batch) {
 		SqlParameterSourceAdapter paramSourceAdapter = new SqlParameterSourceAdapter();
 		
